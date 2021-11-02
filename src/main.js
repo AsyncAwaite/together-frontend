@@ -37,7 +37,7 @@ import "@/scss/buttons.scss";
 import * as VueGoogleMaps from 'vue2-google-maps'
 Vue.use(VueGoogleMaps, {
   load: {
-    key: 'AIzaSyDQnxc60Vdh7yNbKf0gP3UJJmYnrwAi8sA',
+    key: 'key',
     libraries: 'places', 
   },
 })
