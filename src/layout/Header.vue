@@ -3,14 +3,15 @@
     <header class="header" :class="{ hideTop: hideTop }">
       <div class="container">
         <div class="row align-items-center">
-          <div class="col-5 col-lg-3 d-flex align-items-center">
+          <div class="col-4 order-1 col-lg-2 d-flex align-items-center">
             <router-link :to="{ name: 'home' }" class="header__logo">
               <img src="@/assets/img/logo_dark.svg" alt="" />
             
             </router-link>
              <span class="header__beta">beta</span>
           </div>
-          <div class="col-6 d-none d-lg-block">
+               <headerSearch />
+          <div class="col-6 col-lg-3 order-2">
             <div class="header__links ">
               <ul>
                 <li>
@@ -19,7 +20,6 @@
                   >
                     {{ $t("view_titles.about") }}
                   </router-link>
-                  <a href="#"></a>
                 </li>
                 <li>
                   <router-link
@@ -31,7 +31,7 @@
               </ul>
             </div>
           </div>
-          <div class="col-7 col-lg-3 justify-content-end">
+          <div class="col-2 col-lg-3 order-3 ">
             <div>
               <header-user />
             </div>
@@ -76,7 +76,7 @@
               >
                 <icon variant="menu" />
               </div>
-              <headerSearch />
+         
             </div>
             <div class="col-3">
               <div class="header__language text-right">
@@ -231,22 +231,25 @@ margin-top: 5px;
   }
 
   &__links {
+   
     ul {
       list-style: none;
       display: flex;
+justify-content: space-around;
       padding: 0;
-      margin: 0;
-      li {
+      margin: 0; width: 100%;
+      li {  display: flex;
+          align-items: center;
+            text-align: center;
         a {
           font-style: normal;
           font-weight: 500;
           font-size: 14px;
-          display: flex;
-          align-items: center;
-          text-align: center;
+        width: 100%;
+      
           color: #000000;
           text-transform: uppercase;
-          margin-right: 40px;
+          // margin-right: 40px;
         }
       }
     }
