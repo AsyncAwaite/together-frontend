@@ -1,11 +1,11 @@
 <template>
-  <div class="search__input-group" v-click-outside="hide">
+  <div class="search__input-group  col-lg-4 col-12  order-4" v-click-outside="hide">
     <input
       type="text"
       :placeholder="$t('labels.search')"
       v-model="searchTerm"
     />
-    <button class="d-none d-lg-inline-flex">
+    <button class="d-lg-inline-flex">
       <icon variant="search" />
     </button>
     <div class="search__results" v-show="showSearchResults">
@@ -181,7 +181,11 @@ export default {
       svg {
         fill: #fff;
       }
-    }
+    } 
+     @media (max-width: 990px) {
+        margin-top: 10px;
+      }
   }
+  
 }
 </style>
