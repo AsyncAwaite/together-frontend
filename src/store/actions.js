@@ -53,6 +53,9 @@ const actions = {
   setSellerTerms({ commit }, payload) {
     commit("SET_SELLER_TERMS", payload);
   },
+  setOrderId({ commit }, payload) {
+    commit("SET_ORDER_ID", payload);
+  },
 
   // /////////////////////////////////////////////
   // Set homepage products

@@ -21,6 +21,7 @@ const state = {
   bodyOverlay: false,
   events:{
     card_added:false,
+    payment_online: false,
   },
   scrollY: 0,
   authModal: {
@@ -29,6 +30,7 @@ const state = {
   },
   api: api,
   orders:[],
+  orderId:null,
   translationsLoaded:false,
   user_current_role: null,
   categories: [],

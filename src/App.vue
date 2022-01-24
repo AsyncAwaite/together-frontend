@@ -203,6 +203,7 @@ export default {
     });
   },
   mounted() {
+ 
     this.setInitialRoleOnLogin();
 
     let token = this.getCookie("XSRF-TOKEN");
@@ -218,6 +219,9 @@ export default {
     return {
       title: this.$t('pages.main_title'),     
       titleTemplate: `%s | ${this.$t('pages.main_title')}`,
+      meta: [
+     { name: 'description', content:  `${this.$t('pages.main_meta_descr')}` }
+    ]
      
     }
     

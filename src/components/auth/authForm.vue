@@ -400,6 +400,12 @@ export default {
       var url = "/api/auth/google?role=" + this.registration.role;
       this.$api.get(url).then((response) => {
         console.log(response.data);
+            this.submitLogin();
+              this.$gtag.event('Регистрация через Google', {
+            'event_category': "Регистрация пользователя",
+            'event_label': "Регистрация через Google",
+            'value': 1,
+          });
         window.open(response.data, "_self");
       });
     },
@@ -407,6 +413,12 @@ export default {
       var url = "/api/auth/facebook?role=" + this.registration.role;
       this.$api.get(url).then((response) => {
         console.log(response.data);
+            this.submitLogin();
+              this.$gtag.event('Регистрация через Facebook', {
+            'event_category': "Регистрация пользователя",
+            'event_label': "Регистрация через Facebook",
+            'value': 1,
+          });
         window.open(response.data, "_self");
       });
     },
@@ -487,6 +499,12 @@ export default {
           this.login_data.email = this.registration.email;
           this.login_data.password = this.registration.password;
           this.submitLogin();
+              this.$gtag.event('Регистрация пользователя', {
+            'event_category': "Регистрация пользователя",
+            'event_label': "Обычная регистрация",
+            'value': 1,
+          });
+          window.fbq('track', 'CompleteRegistration');
         }
       } catch (error) {
         this.error.registration = true;
@@ -530,6 +548,7 @@ export default {
     },
   },
   mounted() {
+ 
     this.$nextTick(() => {
       console.log(this.usecase);
       if (

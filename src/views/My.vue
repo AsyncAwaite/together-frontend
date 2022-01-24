@@ -55,6 +55,9 @@ export default {
     return {
       title: this.$t("view_titles.my"),
       titleTemplate: `%s | ${this.$t('pages.main_title')}`,
+         meta: [
+      { name: "description", content: `${this.$t("pages.main_meta_descr")}` },
+    ],
     }
   }
 };

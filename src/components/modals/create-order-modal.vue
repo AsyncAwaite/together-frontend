@@ -46,45 +46,36 @@
                 </h5>
                 <div class="qty d-flex align-items-center">
                   <div>{{ $t("labels.quantity") }}:</div>
-                  <b-input type="number" size="sm" v-model="qty"> </b-input>
+                  <b-input
+                    type="number"
+                    size="sm"
+                    v-model="qty"
+                    @change="emitQty"
+                  >
+                  </b-input>
                 </div>
               </div>
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group form-group_shipment">
             <h4 class="bordered-title">
               <span>
                 {{ $t("labels.shipment") }}
               </span>
             </h4>
-       <b-form-radio-group
+            <b-form-radio-group
               class="mb-2 mt-3 w-100"
               id="delivery-type"
-              v-model="delivery.type"
+              v-model="deliveryType"
               :options="[
-                { text: $t('labels.delivery_department'), value: 2 },
-                { text: $t('labels.delivery_courier'), value: 3 },
+                { text: $t('labels.delivery_department'), value: 0 },
+                { text: $t('labels.delivery_courier'), value: 1 },
               ]"
               button-variant="outline-primary"
               name="delivery-type"
+              @change="clearDepartment"
               buttons
             ></b-form-radio-group>
-
-            <!-- <b-form-group>
-              <b-form-radio
-                v-model="shipment"
-                name="shipment-method"
-                value="У відділенні"
-                checked="checked"
-                >У відділенні</b-form-radio
-              >
-              <b-form-radio
-                v-model="shipment"
-                name="shipment-method"
-                value="Кур'єром"
-                >Кур'єром</b-form-radio
-              >
-            </b-form-group> -->
             <b-form-select v-model="selectedRegion" class="mb-2">
               <b-form-select-option :value="null">{{
                 $t("labels.choose_region")
@@ -145,7 +136,7 @@
                 </span>
               </template>
             </v-select>
-            <template v-if="delivery.type === 2">
+            <template v-if="deliveryType === 0">
               <v-select
                 :filter="fuseSearch"
                 :options="selectedCity ? selectedCity.warehouses : []"
@@ -194,53 +185,78 @@
               </v-select>
             </template>
             <template v-else>
-              <!-- Подвязка улицы -->
-              <v-select
-                :filter="fuseSearch"
-                :options="selectedCity ? selectedCity.address : []"
-                v-model="selectedAdress"
-                :clearable="false"
-                :loading="isloading"
-                autocomplete="on"
-                @option:selecting="selectAdress"
-              >
-                <template #no-options="{ search }">
-                  <div v-if="search">
-                    {{ $t("labels.no_results-1") }}
-                    <strong>
-                      {{ search }}
-                    </strong>
-                    {{ $t("labels.no_results-2") }}
+            
+                <div class="d-flex align-items-center order-street">
+                <div class="d-flex align-items-center w-50 mr-2">
+                  <span class="mr-2"> Вул.</span>
+                  <v-select
+                    :filter="fuseSearch"
+                    :options="selectedCity ? selectedCity.streets : []"
+                    v-model="selectedAdress"
+                    :clearable="false"
+                    :loading="isloading"
+                    autocomplete="on"
+                    @option:selecting="selectStreet"
+                    class="w-100"
+                  >
+                    <template #no-options="{ search }">
+                      <div v-if="search">
+                        {{ $t("labels.no_results-1") }}
+                        <strong>
+                          {{ search }}
+                        </strong>
+                        {{ $t("labels.no_results-2") }}
+                      </div>
+                      <div v-else>
+                        {{ $t("labels.choose_city") }}
+                      </div>
+                    </template>
+                    <template #selected-option="{ title_ua, title_ru }">
+                      <div>
+                        <span v-if="$i18n.local == 'ua'">
+                          {{ title_ua }}
+                        </span>
+                        <span v-if="$i18n.local == 'ru'">
+                          {{ title_ru }}
+                        </span>
+                        <span v-else>
+                          {{ title_ua }}
+                        </span>
+                      </div>
+                    </template>
+                    <template #option="{ title_ua, title_ru }">
+                      <span v-if="$i18n.local == 'ua'">
+                        {{ title_ua }}
+                      </span>
+                      <span v-if="$i18n.local == 'ru'">
+                        {{ title_ru }}
+                      </span>
+                      <span v-else>
+                        {{ title_ua }}
+                      </span>
+                    </template>
+                  </v-select>
+                </div>
+
+                <div class="d-flex align-items-center w-50">
+                  <div class="mr-2 d-flex align-items-center">
+                    <span class="mr-2">Буд.</span>
+                    <b-form-input
+                      id="order-house"
+                      v-model="selectedHouse"
+                      type="text"
+                    ></b-form-input>
                   </div>
-                  <div v-else>
-                    {{ $t("labels.choose_city") }}
+                  <div class="d-flex align-items-center">
+                    <span class="mr-2">Кв.</span>
+                    <b-form-input
+                      id="order-room"
+                      v-model="selectedRoom"
+                      type="text"
+                    ></b-form-input>
                   </div>
-                </template>
-                <template #selected-option="{ title_ua, title_ru }">
-                  <div>
-                    <span v-if="$i18n.local == 'ua'">
-                      {{ title_ua }}
-                    </span>
-                    <span v-if="$i18n.local == 'ru'">
-                      {{ title_ru }}
-                    </span>
-                    <span v-else>
-                      {{ title_ua }}
-                    </span>
-                  </div>
-                </template>
-                <template #option="{ title_ua, title_ru }">
-                  <span v-if="$i18n.local == 'ua'">
-                    {{ title_ua }}
-                  </span>
-                  <span v-if="$i18n.local == 'ru'">
-                    {{ title_ru }}
-                  </span>
-                  <span v-else>
-                    {{ title_ua }}
-                  </span>
-                </template>
-              </v-select>
+                </div>
+              </div>
             </template>
           </div>
           <div class="form-group">
@@ -249,80 +265,50 @@
                 {{ $t("labels.payment") }}
               </span>
             </h4>
-         
-            <!-- <b-form-group>
-              <b-form-radio
-                v-model="userPayment"
-                name="delivery-pay"
-                value="У відділенні"
-                >У відділенні (наложений платіж)</b-form-radio
-              >
-              <b-form-radio
-                v-model="userPayment"
-                name="card-pay"
-                value="Оплата картой"
-                >Оплата картой</b-form-radio
-              >
-            </b-form-group> -->
-            <!-- на карту у выддыленны -->
-             <b-form-radio-group
-            class="mb-2 mt-3 w-100"
-            id="delivery-payment"
-            v-model="delivery.payment"
-            :options="[
-              { text: $t('labels.payment_department'), value: 2 },
-              { text: $t('labels.payment_online'), value: 3 },
-            ]"
-            button-variant="outline-primary"
-            name="delivery-payment"
-            buttons
-          ></b-form-radio-group>
-            <template v-if="delivery.payment=== 3">
-              <div v-show="cards.length < 1">
-                <b-alert show variant="warning" class="py-1 px-2">
-                  {{ $t("warnings.no_added_cards") }}
-                  <div class="mt-2 d-flex mb-1">
-                    <b-button variant="warning" size="sm" @click="addCard">{{
-                      $t("buttons.add_card")
-                    }}</b-button>
+
+            <div v-show="cards.length < 1">
+              <b-alert show variant="warning" class="py-1 px-2">
+                {{ $t("warnings.no_added_cards") }}
+                <div class="mt-2 d-flex mb-1">
+                  <b-button variant="warning" size="sm" @click="addCard">{{
+                    $t("buttons.add_card")
+                  }}</b-button>
+                </div>
+              </b-alert>
+            </div>
+            <v-select
+              v-if="cards && cards.length > 0"
+              :options="cards"
+              v-model="selectedPayment"
+              :clearable="false"
+              autocomplete="on"
+              :loading="isloading"
+              @option:selecting="selectPayment"
+            >
+              <template #no-options="{}">
+                <div>
+                  {{ $t("labels.no_payments") }}
+                </div>
+              </template>
+              <template #selected-option="{ masked_card, card_type }">
+                <div class="d-flex align-items-center">
+                  <div class="card-type mr-2">
+                    <icon v-if="card_type == 'VISA'" variant="visa" />
+                    <icon v-else variant="mc" />
                   </div>
-                </b-alert>
-              </div>
-              <v-select
-                v-if="cards && cards.length > 0"
-                :options="cards"
-                v-model="selectedPayment"
-                :clearable="false"
-                autocomplete="on"
-                :loading="isloading"
-                @option:selecting="selectPayment"
-              >
-                <template #no-options="{}">
-                  <div>
-                    {{ $t("labels.no_payments") }}
+                  {{ masked_card }}
+                </div>
+              </template>
+              <template #option="{ masked_card, card_type }">
+                <div class="d-flex align-items-center">
+                  <div class="card-type mr-2">
+                    <icon v-if="card_type == 'VISA'" variant="visa" />
+                    <icon v-else variant="mc" />
                   </div>
-                </template>
-                <template #selected-option="{ masked_card, card_type }">
-                  <div class="d-flex align-items-center">
-                    <div class="card-type mr-2">
-                      <icon v-if="card_type == 'VISA'" variant="visa" />
-                      <icon v-else variant="mc" />
-                    </div>
-                    {{ masked_card }}
-                  </div>
-                </template>
-                <template #option="{ masked_card, card_type }">
-                  <div class="d-flex align-items-center">
-                    <div class="card-type mr-2">
-                      <icon v-if="card_type == 'VISA'" variant="visa" />
-                      <icon v-else variant="mc" />
-                    </div>
-                    {{ masked_card }}
-                  </div>
-                </template>
-              </v-select>
-            </template>
-            <!-- Оплата по ссылке с бека -->
+                  {{ masked_card }}
+                </div>
+              </template>
+            </v-select>
           </div>
           <div class="for-group mb-4">
             <h4 class="bordered-title">
@@ -415,25 +401,20 @@ export default {
       selectedCity: null,
       selectedWarehouse: null,
       selectedAdress: null,
+      selectedHouse: null,
+      selectedRoom: null,
+      paymentType: 0,
+      deliveryType: 0,
       finalQty: 1,
       phone: "",
       firstName: "",
-      lastName: "",
+      lastName: this.user.lastName ? this.user.lastName : '',
       email: "",
       orderComment: "",
-        delivery: {
-        type: 2,
-        payment: 2
-      },
-      userPayment: "У відділенні",
-      shipment: "У відділенні",
-
-      //source data
       city: [],
       cards: [],
       gettingCardsTimer: null,
 
-      //validation
       phoneValid: false,
     };
   },
@@ -482,15 +463,28 @@ export default {
       if (!this.selectedCity) {
         valid = false;
       }
-      if (!this.selectedWarehouse) {
-        valid = false;
+      if (this.deliveryType === 0) {
+        if (!this.selectedWarehouse) {
+          valid = false;
+        }
+      } else {
+        if (!this.selectedAdress) {
+          valid = false;
+        }
+        if (!this.selectedHouse) {
+          valid = false;
+        }
+        if (!this.selectedRoom) {
+          valid = false;
+        }
       }
+
       if (!this.phoneValid) {
         valid = false;
       }
-      // if (!this.selectedPayment) {
-      //   valid = false;
-      // }
+      if (!this.selectedPayment) {
+        valid = false;
+      }
       if (!this.user.id) {
         if (!this.firstName) {
           valid = false;
@@ -527,6 +521,30 @@ export default {
     },
   },
   methods: {
+    clearDepartment() {
+      if (this.deliveryType === 1) {
+        this.selectedWarehouse = null;
+      } else {
+        this.selectedAdress = null;
+        this.selectedHouse = null;
+        this.selectedRoom = null;
+      }
+    },
+    emitQty() {
+      if (this.product) {
+        var total = Number(this.product.total);
+        var purchased = Number(this.product.total_bought);
+        var itemsLeft = total - purchased;
+        console.log(itemsLeft);
+        if (this.qty > itemsLeft) {
+          this.qty = itemsLeft;
+        }
+        if (this.qty <= 0) {
+          this.qty = 1;
+        }
+      }
+      this.$emit("update", this.qty);
+    },
     openNoPaymentModal() {
       this.emitClose();
       this.$bvModal
@@ -604,17 +622,16 @@ export default {
     selectWarehouse(warehouse) {
       this.selectedWarehouse = warehouse;
     },
-    selectAdress(adress) {
-      this.selectedAdress = adress;
+    selectStreet(street) {
+      this.selectedAdress = street;
     },
-    selectPayment(payment) {
+      selectPayment(payment) {
       //Проверка на оплату
-      if (this.userPayment.value === "Оплата картой") {
+ 
         this.selectedPayment = payment;
-      } else {
-        this.selectedPayment = payment;
-      }
+    
     },
+
     getNpCity() {
       this.selectedCity = null;
       this.selectedWarehouse = null;
@@ -677,20 +694,35 @@ export default {
         seller_id: this.product.user_id,
         buyer_id: this.user.id,
         card_id: this.selectedPayment.id,
+        payment_type: this.paymentType,
         buyer_name: this.user.name
           ? this.user.name
           : this.lastName + " " + this.firstName,
+        buyer_last_name: this.lastName,
+        buyer_email: this.user.email,
         buyer_phone: this.phone, //СВЯЗАТЬ С ДАННЫМИ ПОЛЬЗОВАТЕЛЯ
         start_price: Number(this.start_price),
         count: Number(this.qty),
         start_total: Number(this.start_price * this.qty),
-        comment: this.orderComment,
-        delivery_type: 1,
+        comment:
+          this.orderComment === ""
+            ? (this.orderComment = "test text")
+            : this.orderComment,
+        delivery_type: this.deliveryType,
         delivery_region: this.selectedRegion.sync_code,
         delivery_city: this.selectedCity.sync_code,
-        delivery_warehouse: this.selectedWarehouse.sync_code,
+        delivery_warehouse: this.selectedWarehouse
+          ? this.selectedWarehouse.sync_code
+          : "",
+        delivery_street: this.selectedAdress
+          ? this.selectedAdress.sync_code
+          : "",
+        delivery_house: this.selectedHouse ? this.selectedHouse : "",
+        delivery_room: this.selectedRoom ? this.selectedRoom : "",
         delivery_comment: "",
-      };
+          type: 0
+      };   
+      console.log(order);
       this.$apollo
         .mutate({
           mutation: ORDER_CREATE,
@@ -700,7 +732,8 @@ export default {
         })
         .then((data) => {
           var id = data.data.userOrderCreate.id;
-          this.checkIfOrderPayed(id);
+   this.holdWithCard(id)
+          // this.checkIfOrderPayed(id);
         })
         .catch((error) => {
           this.isloading = false;
@@ -712,7 +745,7 @@ export default {
         .get("/api/payment-status/" + id)
         .then((response) => {
           if (response.data.result == true) {
-            this.openSuccessModal();
+            this.thankYou(id);
             // this.openNoPaymentModal();
           } else {
             this.openNoPaymentModal();
@@ -721,6 +754,53 @@ export default {
         .catch((error) => {
           console.log(error);
         });
+    },
+       holdWithCard(id) {
+      this.isloading = true;
+      var url = "/api/hold-with-token";
+      this.$api
+        .post(url, {
+          order_id: +id,
+          card_id: this.selectedPayment.id,
+        })
+        .then((data) => {
+          console.log(data.data);
+          if (data.data.result == true || data.data.result == "true") {
+            // this.thankYou(id);
+            console.log(data.data);
+            this.openSuccessModal();
+          } else {
+            // this.openNoPaymentModal()
+            this.$bvModal
+              .msgBoxOk(
+                "Сталася помилка! Відмова від банка-емітента вашої картки, можливо на карті встановлені обмеження за розрахунками в інтернеті.",
+                {
+                  title: "На жаль...Ми не змогли прийняти ваш платіж!",
+                  size: "lg",
+                  buttonSize: "md",
+                  okVariant: "warning",
+                  okTitle: "Сталася помилка!",
+                  footerClass: "p-2",
+                  hideHeaderClose: false,
+                  centered: true,
+                }
+              )
+          }
+          this.isloading = false;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.order_pay_error = error;
+          this.isloading = false;
+        });
+    },
+       thankYou(id) {
+      let orderId = id;
+      // this.$store.dispatch("setOrderId", orderId);
+
+      let url =
+        location.protocol + "//" + location.host + "/success?id=" + orderId;
+      window.open(url, "_self");
     },
     addCard() {
       var target = "";
@@ -755,6 +835,7 @@ export default {
     }, 1500);
 
     this.finalQty = this.qty;
+  
   },
 };
 </script>
@@ -840,5 +921,29 @@ export default {
   }
   // &__footer {
   // }
+}
+@media (max-width: 576px) {
+  .order-modal {
+    &__content {
+      .btn-group {
+        label {
+          display: none !important;
+        }
+      }
+      .order-street {
+        flex-wrap: wrap;
+        .w-50 {
+          width: 100% !important;
+          margin-right: 0 !important;
+          margin-bottom: 0.5rem;
+        }
+      }
+      .form-group {
+        &_shipment {
+          height: 265px;
+        }
+      }
+    }
+  }
 }
 </style>

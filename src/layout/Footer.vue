@@ -5,25 +5,25 @@
         <div class="col-12">
           <div class="text-center mb-1">
             <a
-              href="https://facebook.com"
+              href="https://www.facebook.com/together.service"
               target="_blank"
               class="d-inline-block p-2"
             >
-              <img src="@/assets/img/fb.png" alt="" />
+              <img src="@/assets/img/fb.png" alt="Logo FaceBook" />
             </a>
             <a
-              href="https://youtube.com"
+              href="https://www.youtube.com/channel/UCKu4aJ35GU57bezNOb446YQ"
               target="_blank"
               class="d-inline-block p-2"
             >
-              <img src="@/assets/img/youtube.png" alt="" />
+              <img src="@/assets/img/youtube.png" alt="Logo YouTube" />
             </a>
             <a
-              href="https://instagram.com"
+              href="https://www.instagram.com/together_ua/"
               target="_blank"
               class="d-inline-block p-2"
             >
-              <img src="@/assets/img/ig.png" alt="" />
+              <img src="@/assets/img/ig.png" alt="Logo Instagram" />
             </a>
           </div>
 
@@ -76,6 +76,16 @@
                 }"
               >
                {{$t('pages.page_return_title')}}
+              </router-link>
+            </li>
+                 <li>
+              <router-link
+                :to="{
+                  name: 'page',
+                  params: { slug: 'warranty' },
+                }"
+              >
+               {{$t('pages.page_warranty_title')}}
               </router-link>
             </li>
           </ul>

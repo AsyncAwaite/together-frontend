@@ -11,7 +11,7 @@
                   {{ $t("view_titles.product_tab_one_title") }}
                 </template>
                 <div class="row pt-4">
-                  <div class="col-12 col-md-7">
+                  <div class="col-12 col-md-6">
                     <productImagesSkeleton v-if="productIsLoading" />
                     <product-images
                       v-else
@@ -19,7 +19,7 @@
                       :purchased="alreadyPurchased"
                     />
                   </div>
-                  <div class="col-12 col-md-5">
+                  <div class="col-12 col-md-6">
                     <productAddCartSkeleton v-if="productIsLoading" />
                     <template v-else>
                       <product-purchase-graph
@@ -50,11 +50,11 @@
                   {{ $t("view_titles.product_tab_three_title") }}
                 </template>
               </b-tab> -->
-              <b-tab>
+              <!-- <b-tab>
                 <template #title>
                   {{ $t("view_titles.product_tab_four_title") }}
                 </template>
-              </b-tab>
+              </b-tab> -->
             </b-tabs>
           </b-card>
           <b-card class="mt-4 mb-4">
@@ -143,6 +143,12 @@ export default {
       isAuthenticated: "sanctum/isAuthenticated",
       viewedProducts: "viewedProducts",
     }),
+  // orderInProgress() {
+  //   let inProgress = false;
+  //   if(this.$refs.purchaseBlock.orderModalOpen === true ||)
+  //   return inProgress
+
+  // }
   },
   watch: {
     $route(to, from) {
@@ -292,7 +298,7 @@ export default {
 
     //poll for purcahses while product is opened
     setInterval(() => {
-      if (this.$refs.purchaseBlock.orderModalOpen !== true) {
+      if (this.$refs.purchaseBlock && this.$refs.purchaseBlock.orderModalOpen !== true) {
         console.log('fetching product')
         this.getProduct();
       }
@@ -302,9 +308,18 @@ export default {
     return {
       title: this.product.title,
       titleTemplate: `%s | ${this.$t('pages.main_title')}`, 
+         meta: [
+      { name: "description", content: `${this.$t("pages.main_meta_descr")}` },
+    ],
     }
   }
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@media (max-width: 576px) {
+h1 {
+  font-size: 1.5rem;
+}
+}
+</style>

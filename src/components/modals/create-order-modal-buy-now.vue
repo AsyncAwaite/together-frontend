@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-modal
-      id="create-order-modal-no-user"
+      id="create-order-modal-buy-now"
       v-model="open"
       hide-footer
       hide-header-close
@@ -24,10 +24,6 @@
         blur="none"
       >
         <div class="order-modal__content">
-          <b-button variant="primary" @click="showAuth" class="mb-2 w-100">{{
-            $t("buttons.action_login")
-          }}</b-button>
-
           <div class="form-group">
             <div class="product d-flex">
               <div
@@ -46,7 +42,7 @@
               </div>
               <div class="text">
                 <h5 class="bordered-title">
-                  {{ product.title }}
+                  {{ product.title }} 
                 </h5>
                 <div class="qty d-flex align-items-center">
                   <div>{{ $t("labels.quantity") }}:</div>
@@ -61,14 +57,15 @@
               </div>
             </div>
           </div>
-          <div class="form-group">
+         
+          <div class="form-group form-group_shipment">
             <h4 class="bordered-title">
               <span>
                 {{ $t("labels.shipment") }}
               </span>
             </h4>
             <b-form-radio-group
-              class="mb-2 mt-3 w-100"
+              class="mb-2 mt-2 w-100"
               id="delivery-type"
               v-model="deliveryType"
               :options="[
@@ -190,10 +187,9 @@
               </v-select>
             </template>
             <template v-else>
-              <!-- Подвязка улицы -->
-              <div class="d-flex align-items-center">
+              <div class="d-flex align-items-center order-street">
                 <div class="d-flex align-items-center w-50 mr-2">
-                  <span class="mr-2">вул.</span>
+                  <span class="mr-2"> Вул.</span>
                   <v-select
                     :filter="fuseSearch"
                     :options="selectedCity ? selectedCity.streets : []"
@@ -242,47 +238,46 @@
                     </template>
                   </v-select>
                 </div>
-
-                <div class="d-flex align-items-center w-25 mr-2">
-                  <span class="mr-2">Буд.</span>
-                  <b-form-input
-                    id="order-house"
-                    v-model="selectedHouse"
-                    type="text"
-                  ></b-form-input>
-                </div>
-                <div class="d-flex align-items-center w-25">
-                  <span class="mr-2">Кв.</span>
-                  <b-form-input
-                    id="order-room"
-                    v-model="selectedRoom"
-                    type="text"
-                  ></b-form-input>
+                <div class="d-flex align-items-center w-50">
+                  <div class="mr-2 d-flex align-items-center">
+                    <span class="mr-2">Буд.</span>
+                    <b-form-input
+                      id="order-house"
+                      v-model="selectedHouse"
+                      type="text"
+                    ></b-form-input>
+                  </div>
+                  <div class="d-flex align-items-center">
+                    <span class="mr-2">Кв.</span>
+                    <b-form-input
+                      id="order-room"
+                      v-model="selectedRoom"
+                      type="text"
+                    ></b-form-input>
+                  </div>
                 </div>
               </div>
             </template>
           </div>
-          <div class="form-group">
+          <div class="form-group" :class="{ 'form-group_payment': user.id }">
             <h4 class="bordered-title">
               <span>
                 {{ $t("labels.payment") }}
               </span>
             </h4>
-            <b-form-radio-group
-              class="mb-2 mt-3 w-100"
+            <b-form-radio-group 
+              class="mb-2 mt-2 w-100"
               id="delivery-payment"
               v-model="paymentType"
               :options="[
-                { text: $t('labels.payment_department'), value: 3 },
-                { text: $t('labels.payment_online'), value: 2 },
+                { text: $t('labels.payment_department'), value: 3},
+                { text: $t('labels.payment_online'), value: payment },
               ]"
               button-variant="outline-primary"
               name="delivery-payment"
               buttons
-            ></b-form-radio-group>
-            <!-- <template
-              v-if="this.user.id && this.userPayment === 'Оплата картой'"
-            >
+            ></b-form-radio-group>           
+            <template v-if="user.id && paymentType === 1">
               <div v-show="cards.length < 1">
                 <b-alert show variant="warning" class="py-1 px-2">
                   {{ $t("warnings.no_added_cards") }}
@@ -326,16 +321,14 @@
                   </div>
                 </template>
               </v-select>
-            </template> -->
+            </template>
           </div>
-          <div class="for-group mb-4">
+          <div class="form-group mb-4">
             <h4 class="bordered-title">
               <span>
                 {{ $t("labels.reciever") }}
               </span>
             </h4>
-            <div class="input-group"></div>
-
             <template v-if="!this.user.id">
               <div class="input-group">
                 <b-form-input
@@ -368,17 +361,17 @@
                 >
               </div>
             </template>
-            <!-- <template v-else>
-              <h6>
+            <template v-else>
+              <h6 class="mt-3">
                 {{ user.name }}
               </h6>
-            </template> -->
+            </template>
             <vue-tel-input
               :input-options="telOptions"
               @validate="validateTel"
               v-model="phone"
             ></vue-tel-input>
-          </div>
+          </div>  
           <div class="form-group">
             <h4 class="bordered-title">
               <span>
@@ -434,7 +427,7 @@ import { mapGetters } from "vuex";
 import _ from "lodash";
 
 export default {
-  props: ["product", "user", "qty", "open"],
+  props: ["product", "user", "qty", "open", 'payment'],
   apollo: {
     regions: {
       query: NP_REGIONS,
@@ -449,8 +442,6 @@ export default {
         placeholder: "Номер телефону",
       },
       isloading: false,
-      //Data for order
-
       selectedPayment: null,
       selectedRegion: null,
       selectedCity: null,
@@ -462,16 +453,15 @@ export default {
       deliveryType: 0,
       finalQty: 1,
       phone: "",
-      firstName: "",
-      lastName: "",
-      email: "",
+      firstName: this.user.id ? this.user.name : "",
+      lastName: this.user.id ? "" : "",
+      email: this.user.id ? this.user.email : "",
       orderComment: "",
       city: [],
       cards: [],
       gettingCardsTimer: null,
 
       phoneValid: false,
-        type: 1
     };
   },
   watch: {
@@ -538,9 +528,11 @@ export default {
       if (!this.phoneValid) {
         valid = false;
       }
-      // if (!this.selectedPayment) {
-      //   valid = false;
-      // }
+      if (this.user.id) {
+        if (!this.selectedPayment) {
+          valid = false;
+        }
+      }
       if (!this.user.id) {
         if (!this.firstName) {
           valid = false;
@@ -552,6 +544,7 @@ export default {
           valid = false;
         }
       }
+
       return valid;
     },
     formattedRegions() {
@@ -570,7 +563,6 @@ export default {
         } else {
           item.text = this.regions[key]["title_" + lang];
         }
-
         regions.push(item);
       }
       return regions;
@@ -591,7 +583,6 @@ export default {
         var total = Number(this.product.total);
         var purchased = Number(this.product.total_bought);
         var itemsLeft = total - purchased;
-        // console.log(itemsLeft);
         if (this.qty > itemsLeft) {
           this.qty = itemsLeft;
         }
@@ -602,75 +593,23 @@ export default {
       this.$emit("update", this.qty);
     },
     openNoPaymentModal() {
-      this.emitClose();
-      this.$bvModal
-        .msgBoxOk(
-          "Замовлення створено, проте нам не вдалося отримати платіж. Товари зарезервовані на 10 хв. Будь ласка, спробуйте сплатии замовлення ще раз",
-          {
-            title: "Майже там!",
-            size: "lg",
-            buttonSize: "md",
-            okVariant: "warning",
-            okTitle: this.$t("view_titles.my_orders"),
-            footerClass: "p-2",
-            hideHeaderClose: false,
-            centered: true,
-          }
-        )
-        .then((value) => {
-          // console.log(value);
-          if (value == true) {
-            this.$router.push({ name: "my", params: { tab: "orders" } });
-          }
-        })
-        .catch((error) => {
-          // An error occurred
-          console.log(error);
-        });
+  
+     this.$bvModal
+              .msgBoxOk(
+                "Сталася помилка! Відмова від банка-емітента вашої картки, можливо на карті встановлені обмеження за розрахунками в інтернеті.",
+                {
+                  title: "На жаль...Ми не змогли прийняти ваш платіж!",
+                  size: "lg",
+                  buttonSize: "md",
+                  okVariant: "warning",
+                  okTitle: "Сталася помилка!",
+                  footerClass: "p-2",
+                  hideHeaderClose: false,
+                  centered: true,
+                }
+              )
     },
-    // openOrderModal(id) {
-    //   // this.emitClose();
-    //   let url = "/api/payment-status/" + id;
-    //   window.open(
-    //     "http://local.together.biz.ua:8080/p/sapogi-columbia-youth-minx-slip-iii",
-    //     "_self"
-    //   );
 
-    //   this.$api
-    //     .post(url, { order_id: id })
-    //     .then((response) => {
-    //       console.log(response.data);
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     });
-    // },
-    openSuccessModal() {
-      this.emitClose();
-      this.$bvModal
-        .msgBoxOk(
-          this.paymentType === 3
-            ? "Замовлення успішно створено"
-            : "Замовлення успішно створено і оплачено",
-          {
-            title: "Вітаємо!",
-            size: "lg",
-            buttonSize: "md",
-            okVariant: "success",
-            okTitle: "Ok",
-            footerClass: "p-2",
-            hideHeaderClose: false,
-            centered: true,
-          }
-        )
-        .then((value) => {
-          console.log(value);
-        })
-        .catch((error) => {
-          // An error occurred
-          console.log(error);
-        });
-    },
     validateTel(e) {
       if (e.valid) {
         this.phoneValid = e.valid;
@@ -704,7 +643,13 @@ export default {
     selectStreet(street) {
       this.selectedAdress = street;
     },
-
+    selectPayment(payment) {
+        this.selectedPayment = payment;
+      console.log(this.selectedPayment);
+    },
+    selectCard(card) {
+      this.selectedCard = card;
+    },
     getNpCity() {
       this.selectedCity = null;
       this.selectedWarehouse = null;
@@ -722,7 +667,6 @@ export default {
           fetchPolicy: "network",
         })
         .then((data) => {
-          console.log(data);
           this.city = data.data.npCity;
           this.isloading = false;
         })
@@ -732,28 +676,60 @@ export default {
         });
     },
 
+    getUserCards() {
+      //Update trigger event in store
+      this.$store.dispatch("setEvents", { card_added: false });
+      // this.isloading = true;
+      if (this.user.id) {
+        var url = "/api/get-user-cards";
+        this.$api
+          .get(url)
+          .then((data) => {
+            let cards = data.data.data;
+            if (Array.isArray(cards) == true) {
+              for (var key in cards) {
+                this.cards.push(cards[key]);
+              }
+            } else {
+              this.cards.push(cards);
+              this.cards.push(cards);
+            }
+            this.isloading = false;
+          })
+          .catch((error) => {
+            this.isloading = false;
+            console.log(error);
+          });
+      }
+    },
+
     emitClose() {
       this.$emit("close");
     },
     placeOrder() {
       this.isloading = true;
+      this.$gtag.event("Оформить заказ", {
+        event_category: "покупка товара",
+        event_label: "Нажата кнопка подтвердить заказ",
+        value: 1,
+      });
 
       var order = {
         product_id: Number(this.product.id),
         seller_id: this.product.user_id,
-        buyer_id: 0,
-        card_id: 0,
+        buyer_id: this.user.id ? this.user.id : 0,
+        card_id: this.user.id ? this.selectedPayment.id : 0,
         payment_type: this.paymentType,
         buyer_name: this.firstName,
         buyer_last_name: this.lastName,
         buyer_email: this.email,
-        buyer_phone: this.phone, //СВЯЗАТЬ С ДАННЫМИ ПОЛЬЗОВАТЕЛЯ
+        buyer_phone: this.phone, 
         start_price: Number(this.start_price),
         count: Number(this.qty),
         start_total: Number(this.start_price * this.qty),
         comment:
           this.orderComment === ""
-            ? (this.orderComment = "test text")
+            ? (this.orderComment = "text")
             : this.orderComment,
         delivery_type: this.deliveryType,
         delivery_region: this.selectedRegion.sync_code,
@@ -767,6 +743,7 @@ export default {
         delivery_house: this.selectedHouse ? this.selectedHouse : "",
         delivery_room: this.selectedRoom ? this.selectedRoom : "",
         delivery_comment: "",
+        type: 1,
       };
       this.$apollo
         .mutate({
@@ -776,17 +753,16 @@ export default {
           },
         })
         .then((data) => {
-          console.log(data)
-          var id = +data.data.userOrderCreate.id;
-          if (this.paymentType === 2) {
-            // this.openOrderModal(id);
+          var id = data.data.userOrderCreate.id;
+          if (this.paymentType === 1) {
+            this.payWithCard(id);
+            return;
+          } else if (this.paymentType === 2) {
             this.payOnline(id);
-            //  this.isloading = true;
-            //  this.openOrderModal(id);
+            return;
           } else {
             this.thankYou(id);
             this.isloading = false;
-            return;
           }
         })
         .catch((error) => {
@@ -794,33 +770,40 @@ export default {
           console.error(error);
         });
     },
-    checkIfOrderPayed(id) {
+    payWithCard(id) {
+      this.isloading = true;
+      var url = "/api/pay-with-token";
       this.$api
-        .get("/api/payment-status/" + id)
-        .then((response) => {
-          // console.log(response.data);
-          if (response.data.result == true) {
-            this.openSuccessModal();
+        .post(url, {
+          order_id: +id,
+          card_id: this.selectedPayment.id,
+        })
+        .then((data) => {
+          console.log(data.data);
+          if (data.data.result == true || data.data.result == "true") {
+            this.thankYou(id);
           } else {
-            this.openNoPaymentModal();
+           this.openNoPaymentModal();
           }
+          this.isloading = false;
         })
         .catch((error) => {
           console.log(error);
+          this.order_pay_error = error;
+          this.isloading = false;
         });
     },
 
     payOnline(id) {
       var target = "";
       let order_id = id;
-      var url = "/api/get-form-purchase/" + order_id;
-
+      let url;
+      if (this.payment_type === 2) {
+        url = "/api/get-form-purchase/" + order_id;
+      }
       this.$api
         .get(url)
         .then((data) => {
-          // console.log(data);
-          // console.log(data.data.data.checkout_url);npm
-
           target = data.data.data.checkout_url;
           window.open(target, "_self");
         })
@@ -828,47 +811,43 @@ export default {
           console.log(error);
         });
     },
-    // addCard() {
-    //   var target = "";
-    //   var callback_url =
-    //     window.location.protocol +
-    //     "//" +
-    //     window.location.host +
-    //     "/redirect-payment-added";
-    //   var url = "/api/get-form-verification?callback_url=" + callback_url;
-    //   this.$api
-    //     .get(url)
-    //     .then((data) => {
-    //       this.getUserCards();
-    //       target = data.data.data.checkout_url;
-    //       window.open(target, "_blank");
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     });
-    // },
+    addCard() {
+      var target = "";
+      var callback_url =
+        window.location.protocol +
+        "//" +
+        window.location.host +
+        "/redirect-payment-added";
+      var url = "/api/get-form-verification?callback_url=" + callback_url;
+      this.$api
+        .get(url)
+        .then((data) => {
+          this.getUserCards();
+          target = data.data.data.checkout_url;
+          window.open(target, "_blank");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
     showAuth() {
       this.$bvModal.show("auth-modal");
     },
     thankYou(id) {
-      let orderId = id;
-      // this.$store.dispatch("setOrderId", orderId);
-
-      let url =
-        location.protocol + "//" + location.host + "/success?id=" + orderId;
+      const url = `${location.protocol}//${location.host}/success?id=${id}`;
       window.open(url, "_self");
-      
     },
   },
   mounted() {
     //Set initial qty
-    // this.getUserCards();
-    // setInterval(() => {
-    //   if (this.selectedPayment == null && !this.cards.length) {
-    //     this.getUserCards();
-    console.log(this.city);
-    //   }
-    // }, 1500);
+    if (this.user) {
+      this.getUserCards();
+      setInterval(() => {
+        if (this.selectedPayment == null && !this.cards.length) {
+          this.getUserCards();
+        }
+      }, 1500);
+    }
 
     this.finalQty = this.qty;
   },
@@ -893,6 +872,9 @@ export default {
     }
     .form-group {
       margin-bottom: 20px;
+      &_payment {
+        height: 120px !important;
+      }
     }
     .bordered-title {
       position: relative;
@@ -961,6 +943,19 @@ export default {
       .btn-group {
         label {
           display: none !important;
+        }
+      }
+      .order-street {
+        flex-wrap: wrap;
+        .w-50 {
+          width: 100% !important;
+          margin-right: 0 !important;
+          margin-bottom: 0.5rem;
+        }
+      }
+      .form-group {
+        &_shipment {
+          height: 265px;
         }
       }
     }

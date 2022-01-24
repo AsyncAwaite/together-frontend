@@ -113,9 +113,10 @@
 
                 <!-- /name-tab -->
                 <b-tab :disabled="!validateTabOne.tab_valid">
-                  <template #title>{{
-                    $t("view_titles.creating_tab_two_title")
-                  }}</template>
+                       
+                  <template #title>
+            
+                    {{$t("view_titles.creating_tab_two_title")}}</template>
                   <div class="add-lot">
                     <div class="add-lot__pricing pt-4 d-flex">
                       <adding-graph :product="product" :key="graphKey" />

@@ -6,7 +6,7 @@
       class="has_new"
       :to="{ name: 'my', params: { tab: 'orders' } }"
     >
-      <icon variant="shopping-cart" />
+      <icon variant="order" />
       <div class="count" v-if="count">
         {{ count }}
       </div>

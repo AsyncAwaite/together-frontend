@@ -2,11 +2,15 @@
   <div class="product__list-card">
     <div
       class="thumb mb-3"
-      :class="{ no_image:!product.images_url || !product.images_url[0] }"
+      :class="{ no_image: !product.images_url || !product.images_url[0] }"
       :style="{ 'background-image': 'url(' + thumb_url + ')' }"
     >
       <router-link :to="{ name: 'product', params: { slug: product.slug } }">
-        <img v-if="product && product.images_url && product.images_url[0]" :src="product.images_url[0]"  alt="" />
+        <img
+          v-if="product && product.images_url && product.images_url[0]"
+          :src="product.images_url[0]"
+          alt=""
+        />
         <div class="purchased-perrcentage">
           <span>{{ $t("labels.purchased") }}</span
           >{{ percentPurchased }} %
@@ -45,19 +49,22 @@
         <span> {{ days }} дні, {{ hours }} год. {{ minutes }} хв. </span>
       </div>
     </vue-countdown>
-    <b-button
-      @click="addToFavourites"
-      variant="light"
-      class="mr-2 mt-2 list-favourites"
-      :disabled="$apollo.loading"
-    >
-      <span v-if="isFavourite">
-        <icon variant="like-filled" color="#ffc108" />
-      </span>
-      <span v-else>
-        <icon variant="like" color="#1bc1a1" />
-      </span>
-    </b-button>
+    <div class="d-flex">
+      <product-add-to-cart v-if="productAvailable" :isProductList="isProductList" :product="product" class="mr-2 mt-2" />
+      <b-button
+        @click="addToFavourites"
+        variant="light"
+        class="mr-2 mt-2 list-favourites d-flex"
+        :disabled="$apollo.loading"
+      >
+        <span v-if="isFavourite">
+          <icon variant="like-filled" color="#ffc108" />
+        </span>
+        <span v-else>
+          <icon variant="like" color="#1bc1a1" />
+        </span>
+      </b-button>
+    </div>
   </div>
 </template>
 
@@ -65,15 +72,18 @@
 import gql from "graphql-tag";
 import VueCountdown from "@chenfengyuan/vue-countdown";
 import { mapActions, mapGetters } from "vuex";
+import productAddToCart from "@/views/product-components/product-add-to-cart.vue";
 export default {
   components: {
     VueCountdown,
+    productAddToCart,
   },
   props: ["p"],
   data() {
     return {
       product: {},
       no_image: require("@/assets/img/no_image.png"),
+      isProductList: true,
     };
   },
   computed: {
@@ -112,7 +122,7 @@ export default {
     thumb_url() {
       var url = this.no_image;
       if (this.product.images_url && this.product.images_url[0]) {
-        url = '';
+        url = "";
       }
       return url;
     },
@@ -151,15 +161,22 @@ export default {
       }
       return minPrice;
     },
+        productAvailable() {
+      var available = true;
+      if (this.product.total_bought >= this.product.total) {
+        available = false;
+      }
+      return available;
+    },
   },
   methods: {
     ...mapActions({
       fetchUser: "sanctum/fetchUser",
     }),
-    trimProductName(name){
+    trimProductName(name) {
       let result = name;
-      if(name && name.length > 60){
-        result = name.substring(0, 60)+'...';
+      if (name && name.length > 60) {
+        result = name.substring(0, 60) + "...";
       }
       return result;
     },
@@ -189,7 +206,7 @@ export default {
         this.$apollo
           .mutate({
             mutation: gql`
-              mutation($id: ID!) {
+              mutation ($id: ID!) {
                 productLikedOrDisLiked(id: $id)
               }
             `,
@@ -210,10 +227,12 @@ export default {
       }
     },
   },
+
   created() {
     this.product["total_bought"] = 0;
     Object.assign(this.product, this.p);
   },
+  mounted() {},
 };
 </script>
 
@@ -224,6 +243,7 @@ export default {
     button {
       min-width: 64px;
       height: 32px !important;
+       
       &:focus,
       &:active {
         outline: none !important;
@@ -320,4 +340,16 @@ export default {
     }
   }
 }
+// .shopping-cart {
+//   height: 32px !important;
+//   padding: 0px 10px !important;
+//   svg {
+//     width: 16px;
+//     height: 16px;
+//   }
+//   &.btn-light {
+//     background-color: #f8f9fa;
+//     border-color: #f8f9fa;
+//   }
+// }
 </style>

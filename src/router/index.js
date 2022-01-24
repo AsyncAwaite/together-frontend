@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import My from "../views/My.vue";
 import AddingLot from "../views/seller/AddingLot.vue";
+import AddingLots from "../views/seller/AddingLots.vue";
 import Category from "../views/Category.vue";
 import Product from "../views/Product.vue";
 import PasswordReset from "../views/PasswordReset.vue";
@@ -16,6 +17,7 @@ const routes = [
     path: "/",
     name: "home",
     component: Home,
+    meta: 'test'
   },
   {
     path: "/my/:tab",
@@ -27,6 +29,11 @@ const routes = [
     path: "/my/lots/add",
     name: "addLot",
     component: AddingLot,
+  },
+  {
+    path: "/my/lots/adds",
+    name: "addLots",
+    component: AddingLots,
   },
   {
     path: "/category/:slug",
@@ -64,6 +71,13 @@ const routes = [
     name: "redirect-payment-added",
     component: () =>
       import(/* webpackPrefetch: true */ "../views/redirect-card-add.vue"),
+  },
+  {
+    path: "/success",
+    name: "success",
+    component: () =>
+      import(/* webpackPrefetch: true */ "../views/page-templates/page-thank-you.vue"),
+      props: { orderId: false}
   },
   {
     path: "/page/:slug",

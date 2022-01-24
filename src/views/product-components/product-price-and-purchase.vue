@@ -4,7 +4,18 @@
       >{{ $t("labels.price") }} {{ $t("labels.per") }} 1
       {{ $t("labels.pcs") }}</label
     >
-    <div class="product__price">{{ currentPrice }} {{ $t("labels.uah") }}</div>
+    <div class="d-flex justify-content-between">
+      <div class="product__price">
+        {{ currentPrice }} {{ $t("labels.uah") }}
+      </div>
+      <!-- <b-button variant="light" size="sm" class="shopping-cart">
+        <icon variant="shopping-cart" />
+   
+     
+      </b-button> -->
+      <product-add-to-cart v-if="productAvailable" :isProductList='isProductList' :product="product"  />
+    </div>
+
     <div class="product__buy-meta mt-4">
       <div class="item d-flex align-items-center" v-if="productAvailable">
         <label for="">{{ $t("labels.enter_quantity") }}</label>
@@ -25,51 +36,65 @@
       </div>
     </div>
     <div class="d-flex mt-2 mb-3">
-      <div class="product__buy">
+      <div class="product__buy product__buy-one mr-2">
+        <!-- :class="{ 'w-100': !this.user.id }" -->
         <b-button
           variant="success"
           block
-         @click="initOrderCreation"
+          @click="initOneClickCreation"
           :disabled="!productAvailable"
+          class="d-flex align-items-center justify-content-center"
         >
           <span v-if="!productAvailable">
             {{ $t("buttons.sold_out") }}
           </span>
           <span v-else>
-            {{ $t("buttons.buy_now") }}
+            {{ $t("buttons.one_click") }}
           </span>
         </b-button>
       </div>
-      <div class="product__favourites">
+      <div class="product__buy product__buy-now">
         <b-button
-          @click="addToFavourites"
-          variant="light"
-          class="ml-2"
-          :disabled="$apollo.loading"
+          variant="success"
+          block
+          @click="initOrderCreation"
+          :disabled="!productAvailable"
+          class="d-flex align-items-center justify-content-center"
         >
-          <span v-if="isFavourite">
-            <icon variant="like-filled" color="#ffc108" />
+          <span v-if="!productAvailable">
+            {{ $t("buttons.sold_out") }}
           </span>
-          <span v-else>
-            <icon variant="like" color="#1bc1a1" />
-          </span>
+          <span v-else> {{ $t("buttons.buy_now") }} </span>
         </b-button>
       </div>
+      <template v-if="this.user.id">
+        <div class="product__favourites">
+          <b-button
+            @click="addToFavourites"
+            variant="light"
+            class="ml-2"
+            :disabled="$apollo.loading"
+          >
+            <span v-if="isFavourite">
+              <icon variant="like-filled" color="#ffc108" />
+            </span>
+            <span v-else>
+              <icon variant="like" color="#1bc1a1" />
+            </span>
+          </b-button>
+        </div>
+      </template>
     </div>
-    <template v-if="this.user.id">
-      <div class="product__add-2-cart" v-show="productAvailable">
-        <b-button variant="success" block   @click="initOrderCreation">
-           <span v-if="isInCart">
-            Додано
-          </span>
-          <span v-else>
-          {{ $t("buttons.add_cart") }}
-          </span>
-         
-        </b-button>
-      </div>
-    </template>
-
+    <div class="product__buy">
+      <b-button block @click="awaitPrice">
+        <span v-if="!productAvailable">
+          {{ $t("buttons.sold_out") }}
+        </span>
+        <span v-else>
+          {{ $t("buttons.await_price") }}
+        </span>
+      </b-button>
+    </div> 
     <create-order-modal
       v-if="isAuthenticated"
       :product="product"
@@ -77,13 +102,21 @@
       :user="user"
       :open="orderModalOpen"
       @close="orderModalOpen = false"
-    />
-    <create-order-modal-no-user
+    /> 
+    <create-order-modal-buy-now
       :product="product"
       :qty="qty"
       :user="user"
-      :open="orderModalNoUserOpen"
-      @close="orderModalNoUserOpen = false"
+      :open="orderModalBuyNow"
+      @close="orderModalBuyNow = false"
+      :payment='payment'
+    />
+    <create-one-click-order
+      :product="product"
+      :qty="qty"
+      :user="user"
+      :open="orderOneClickOpen"
+      @close="orderOneClickOpen = false"
     />
   </div>
 </template>
@@ -93,20 +126,30 @@ import gql from "graphql-tag";
 import { ORDERS_MINI } from "@/constants/graphql";
 // import VueCountdown from "@chenfengyuan/vue-countdown";
 import createOrderModal from "@/components/modals/create-order-modal.vue";
-import createOrderModalNoUser from "@/components/modals/create-order-modal-no-user.vue";
+// import createOrderModalBuyNowNoUser from "@/components/modals/create-order-modal-buy-now-no-user.vue";
+import createOrderModalBuyNow from "@/components/modals/create-order-modal-buy-now.vue";
+import createOneClickOrder from "@/components/modals/create-one-click-order.vue";
+import productAddToCart from "@/views/product-components/product-add-to-cart.vue";
 import { mapActions, mapGetters } from "vuex";
 export default {
   components: {
     // VueCountdown,
     createOrderModal,
-    createOrderModalNoUser
+    // createOrderModalBuyNowNoUser,
+    createOrderModalBuyNow,
+    createOneClickOrder,
+    productAddToCart,
   },
   props: ["product"],
   data() {
     return {
       qty: 1,
       orderModalOpen: false,
-      orderModalNoUserOpen: false
+      orderModalBuyNowNoUser: false,
+      orderModalBuyNow: false,
+      orderOneClickOpen: false,
+      isProductList: false,
+      payment: 1
     };
   },
   computed: {
@@ -134,7 +177,7 @@ export default {
       return status;
     },
     isInCart() {
-     let status = false;
+      let status = false;
       if (this.user) {
         var all_orders = this.user.orders;
       }
@@ -178,21 +221,25 @@ export default {
     ...mapActions({
       fetchUser: "sanctum/fetchUser",
     }),
+    initOneClickCreation() {
+      this.orderOneClickOpen = true;
+  
+    },
     initOrderCreation() {
-      if (this.user.id) {
-      this.orderModalOpen = true;
-      } else {
-         this.orderModalNoUserOpen = true;
-        // this.$store.dispatch("switchToLogin");
-        // this.$bvModal.show("auth-modal");
-      }
+        this.orderModalBuyNow = true;
+        if (this.user.id) {
+          this.payment = 1;
+        } else {
+          this.payment = 2;
+        }
+
     },
     emitQty() {
       if (this.product) {
         var total = Number(this.product.total);
         var purchased = Number(this.product.total_bought);
         var itemsLeft = total - purchased;
-        console.log(itemsLeft);
+        // console.log(itemsLeft);
         if (this.qty > itemsLeft) {
           this.qty = itemsLeft;
         }
@@ -237,7 +284,8 @@ export default {
         this.$bvModal.show("auth-modal");
       }
     },
-        getOrders() { //добавление в корзину???
+    getOrders() {
+      //добавление в корзину???
       this.$apollo
         .query({
           query: ORDERS_MINI,
@@ -253,26 +301,40 @@ export default {
           console.log(error);
         });
     },
-    addToOrders() { //добавление в корзину???
-     this.$apollo
-          .mutate({
-            mutation: gql`
-              mutation ($id: ID!) {
-                productLikedOrDisLiked(id: $id)
-              }
-            `,
-            variables: {
-              id: this.product.id,
-            },
-          })
-          .then((data) => {
-            this.fetchUser();
-            console.log(data);
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+
+    addToOrders() {
+      //добавление в корзину???
+      this.$apollo
+        .mutate({
+          mutation: gql`
+            mutation ($id: ID!) {
+              productLikedOrDisLiked(id: $id)
+            }
+          `,
+          variables: {
+            id: this.product.id,
+          },
+        })
+        .then((data) => {
+          this.fetchUser();
+          console.log(data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
+    awaitPrice() {
+      if (this.user.id) {
+
+        this.orderModalOpen = true;
+
+      } else {
+        this.$bvModal.show("auth-modal");
+      }
+    },
+  },
+  mounted() {
+    
   },
 };
 </script>
@@ -305,17 +367,39 @@ export default {
       outline: none !important;
     }
   }
-  &__add-2-cart,
+ 
   &__buy {
     min-width: calc(100% - 72px);
-    button {
-      background: var(--primary-color);
-      border-color: var(--primary-color);
+    &-one,
+    &-now {
+      min-width: auto;
+      width: 100%;
+    }
+    &-one {
+      button {
+        background: none !important;
+        color: var(--primary-color);
+        transition: all 0.5s linear;
+        border-color: var(--primary-color);
+        &:hover {
+          background: var(--primary-color) !important;
+          color: #fff !important;
+        }
+      }
+    }
+    &-now {
+      button {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        &:hover {
+          background: var(--primary-color);
+          border-color: var(--primary-color);
+          filter: brightness(110%);
+        }
+      }
     }
   }
-  &__add-2-cart {
-    min-width: 100%;
-  }
+
   &__buy-meta {
     .item {
       padding: 5px 0px;
@@ -348,5 +432,17 @@ export default {
     line-height: 42px;
     color: #3e525b;
   }
+  // .w-100 {
+  //   width: 100%;
+  // }
+}
+@media (max-width: 576px) {
+.product__buy{
+  
+      button {
+    font-size: 14px;
+  }
+  
+}
 }
 </style>

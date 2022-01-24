@@ -44,6 +44,9 @@ const getters = {
   viewedProducts: (state)=>{
     return state.viewedProducts
   },
+  orderId: (state)=>{
+    return state.orderId;
+  },
 
 };
 

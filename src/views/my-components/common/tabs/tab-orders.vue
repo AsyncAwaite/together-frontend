@@ -14,8 +14,8 @@
       </template>
       <template v-if="!isloading">
         <div v-for="o in sortedOrders" :key="o.id">
-          <b-card class="mb-4">
-            <order-item :order="o" @pay="payOrderStart" />
+          <b-card v-show="o.payment_type !== 0"  class="mb-4">
+            <order-item  :order="o" @pay="payOrderStart" />
           </b-card>
         </div>
         <b-pagination
@@ -188,8 +188,9 @@ export default {
           },
         })
         .then((data) => {
-          console.log(data.data.orders.data);
-          this.orders = data.data.orders.data;
+         
+          this.orders = data.data.orders.data; 
+          console.log(this.orders);
           var paginator = data.data.orders.paginatorInfo;
 
           //Scroll to top

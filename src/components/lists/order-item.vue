@@ -1,14 +1,17 @@
 <template>
-  <div class="order-item d-flex flex-wrap" v-if="order">
+  <div class="order-item d-flex flex-wrap">
     <div class="info">
       <div class="status mb-2 d-flex align-items-center">
         <div class="id mr-2">#{{ order.id }}</div>
-        <b-badge :variant="badgeVariant(order.status)">{{
-          order.status
+        <b-badge v-if='order.type !== 2' :variant="badgeVariant(order.status)" class="mr-2">{{
+          order.status 
+        }}</b-badge>
+            <b-badge :variant="badgeVariantOrderType( order.type)">{{
+          orderTypeText(order.type)
         }}</b-badge>
       </div>
       <h5>
-        <router-link
+        <router-link  
           :to="{ name: 'product', params: { slug: order.product.slug } }"
         >
           {{ order.product.title }}
@@ -79,7 +82,7 @@
       class="thumb"
       :style="{ backgroundImage: 'url(' + order.product.images_url[0] + ')' }"
     >
-      <router-link
+      <router-link 
         :to="{ name: 'product', params: { slug: order.product.slug } }"
       >
       </router-link>
@@ -89,7 +92,7 @@
       class="order-item__footer w-100 pt-2 d-flex justify-content-end align-items-center"
     >
       <b-button
-        v-if="order && order.status == 'not_pay'"
+        v-if="order && order.status == 'not_pay' && order.type !== 2"
         size="sm"
         variant="warning"
         @click="payOrder(order.id)"
@@ -159,6 +162,31 @@ export default {
       }
       return variant;
     },
+       badgeVariantOrderType(type) {
+      let variant = "primary";
+      if (type == 1) {
+        variant = "info";
+      }
+      if (type == 2) {
+        variant = "dark";
+      }
+      return variant;
+    },
+    orderTypeText (type){
+       let variant;
+      switch (type) {
+        case 0:
+          variant = "групове замовлення";
+          break;
+        case 1:
+          variant = "звичайне замовлення";
+          break;
+        case 2:
+          variant = "замовлення в 1 клік";
+          break;
+      }
+      return variant;
+    }
   },
   mounted() {
     console.log(this.order)

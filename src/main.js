@@ -37,12 +37,17 @@ import "@/scss/buttons.scss";
 import * as VueGoogleMaps from 'vue2-google-maps'
 Vue.use(VueGoogleMaps, {
   load: {
-    key: 'AIzaSyDQnxc60Vdh7yNbKf0gP3UJJmYnrwAi8sA',
+    key: process.env.VUE_APP_GOOGLE_API_KEY,
     libraries: 'places', 
   },
 })
 
 Vue.use(BootstrapVue);
+//Gtag
+import VueGtag from "vue-gtag";
+Vue.use(VueGtag, {
+  config: { id: "UA-209360271-1" }
+});
 
 //Icons utility
 import icon from "@/layout/icons/icon";
@@ -66,6 +71,8 @@ Vue.config.productionTip = false;
 //Sanctum auth
 const axiosApi = axios.create({
   baseURL: "https://api.together.biz.ua/",
+  // baseURL: "https://devapi.together.biz.ua/",
+ 
   withCredentials: true,
 });
 axiosApi.defaults.withCredentials = true;
@@ -134,7 +141,7 @@ Vue.use(VueSanctum, {
 
   store,
 });
-
+console.log(process.env.VUE_APP_GOOGLE_API_KEY)
 import VueLazyload from "vue-lazyload";
 Vue.use(VueLazyload);
 

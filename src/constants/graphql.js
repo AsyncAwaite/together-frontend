@@ -173,6 +173,12 @@ export const NP_CITY = gql`
         title_ru
         sync_code
       }
+      streets {
+        id
+        title_ua
+        title_ru
+        sync_code
+      }
     }
   }
 `;
@@ -215,6 +221,8 @@ export const ORDER_CREATE = gql`
       id
       buyer_id
       buyer_name
+      buyer_last_name
+      buyer_email
       buyer_phone
       start_price
       count
@@ -224,7 +232,12 @@ export const ORDER_CREATE = gql`
       delivery_region
       delivery_city
       delivery_warehouse
+      delivery_street
+      delivery_house
+      delivery_room
       delivery_comment
+      type      
+
     }
   }
 `;
@@ -279,6 +292,8 @@ export const ORDERS_ALL = gql`
         start_total
         last_total
         start_price
+        type
+        payment_type
         transactions {
           id
           order_status

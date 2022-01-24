@@ -3,9 +3,17 @@
     <h3 class="d-flex justify-content-between mb-4">
       {{ $t("view_titles.my_lots") }}
 
-      <b-button size="sm" variant="primary" @click="checkIfUserHasCard">
+      <!-- <b-button size="sm" variant="primary" @click="checkIfUserHasCard">
         <icon variant="plus" color="#fff" class="mr-2" />{{ $t("buttons.add") }}
-      </b-button>
+        
+      </b-button> -->
+      <b-button
+            size="sm" variant="primary" 
+            @click="openAddingModal"
+          >
+           <icon variant="plus" color="#fff" class="mr-2" />{{ $t("buttons.add") }} 
+          </b-button>
+        
     </h3>
     <template v-if="!isloading && !my_products.length">
       <message>
@@ -142,11 +150,35 @@
         </h4>
         <template slot:modal-footer>
           <div class="d-flex">
-            <b-button @click="cancelRemove()">
+            <b-button   @click="cancelRemove()">
               Cancel
             </b-button>
             <b-button @click="removeProduct">
               Confirm remove
+            </b-button>
+          </div>
+        </template>
+      </b-overlay>
+    </b-modal>
+      <b-modal id="product-adding-modal" hide-header hide-footer>
+      <b-overlay
+        id="overlay-adding-modal"
+        :show="$apollo.loading"
+        variant="white"
+        opacity="0.8"
+        spinner-variant="#f00"
+        blur="none"
+      >
+        <h4>
+  Оберіть метод додавання лоту(лотів)
+        </h4>
+        <template slot:modal-footer>
+          <div class="d-flex">
+            <b-button class="mr-3" variant="outline-primary" @click="checkIfUserHasCard" >
+              Додати 1 лот
+            </b-button>
+            <b-button  variant="primary" @click="addingLots">
+              Масова загрузка
             </b-button>
           </div>
         </template>
@@ -230,6 +262,9 @@ export default {
       this.product_to_remove_id = id;
       this.$bvModal.show("product-removing-modal");
     },
+    openAddingModal(){
+this.$bvModal.show("product-adding-modal");
+    },
     addCardPopup() {
       this.$bvModal
         .msgBoxOk(this.$t("warnings.add_card_before_adding_a_lot"), {
@@ -256,36 +291,52 @@ export default {
           console.log(error);
         });
     },
-    checkIfUserHasCard() {
-      // this.initialLoading = true;
-      var url = "/api/get-user-cards";
-      this.$api
-        .get(url)
-        .then((data) => {
+    // checkIfUserHasCard() { Рабочий вариант с картами
+    //   // this.initialLoading = true;
+    //   var url = "/api/get-user-cards";
+    //   this.$api
+    //     .get(url)
+    //     .then((data) => {
          
-          let cards = data.data.data;
-            this.$router.push({ name: "addLot" });
-          // console.log(cards);
-          // this.addCardPopup();
-          if (Array.isArray(cards) == true) {
-            if (cards.length && cards.length > 0) {
-              this.$router.push({ name: "addLot" });
-            } else {
-              this.addCardPopup();
-            }
-          } else {
-            if (cards != null) {
-              this.$router.push({ name: "addLot" });
-            } else {
-              this.addCardPopup();
-            }
-          }
-          this.initialLoading = false;
-        })
-        .catch((error) => {
-          this.initialLoading = false;
-          console.log(error);
-        });
+    //       let cards = data.data.data;
+    //         this.$router.push({ name: "addLot" });
+    //       // console.log(cards);
+    //       // this.addCardPopup();
+    //       if (Array.isArray(cards) == true) {
+    //         if (cards.length && cards.length > 0) {
+    //           this.$router.push({ name: "addLot" });
+    //         } else {
+    //           this.addCardPopup();
+    //         }
+    //       } else {
+    //         if (cards != null) {
+    //           this.$router.push({ name: "addLot" });
+    //         } else {
+    //           this.addCardPopup();
+    //         }
+    //       }
+    //       this.initialLoading = false;
+    //     })
+    //     .catch((error) => {
+    //       this.initialLoading = false;
+    //       console.log(error);
+    //     });
+    // },
+       checkIfUserHasCard() {
+      // this.initialLoading = true;
+    
+       this.$router.push({ name: "addLot" });   
+         this.addCardPopup();
+       this.initialLoading = false;
+    
+    },
+        addingLots() {
+      // this.initialLoading = true;
+    
+       this.$router.push({ name: "addLots" });   
+         this.addCardPopup();
+       this.initialLoading = false;
+    
     },
     removeProduct() {
       this.$apollo

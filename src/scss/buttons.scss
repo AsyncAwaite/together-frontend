@@ -6,9 +6,14 @@
   transition: 0.3s;
   outline: none !important;
   &.list-favourites {
-    height: 32px;
-    padding: 0px 10px;
+    height: 40px;
+    padding: 10px 8px;
     outline:none!important;
+    display: flex;
+    align-items: center;
+    .svg-icon {
+      height: 100%;
+    }
   }
   &-primary,
   &-primary:focus {

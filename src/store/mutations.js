@@ -22,6 +22,7 @@ const mutations = {
   SET_CURRENT_USER_ROLE(state, val) {
     state.user_current_role = val;
   },
+ 
 
   // /////////////////////////////////////////////
   // Global fetched data
@@ -64,6 +65,11 @@ const mutations = {
     state.orders = val;
   },
   // /////////////////////////////////////////////
+     // OrderId
+  // /////////////////////////////////////////////
+  SET_ORDER_ID(state, val) {
+    state.orderId = val;
+  },
   // Set event
   // /////////////////////////////////////////////
   SET_EVENTS(state, val) {

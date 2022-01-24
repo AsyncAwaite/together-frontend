@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-modal
-      id="create-order-modal-no-user"
+      id="create-order-modal-buy-now-no-user"
       v-model="open"
       hide-footer
       hide-header-close
@@ -281,7 +281,7 @@
               buttons
             ></b-form-radio-group>
             <!-- <template
-              v-if="this.user.id && this.userPayment === 'Оплата картой'"
+              v-if="this.user.id && this.paymentType === 2"
             >
               <div v-show="cards.length < 1">
                 <b-alert show variant="warning" class="py-1 px-2">
@@ -471,7 +471,6 @@ export default {
       gettingCardsTimer: null,
 
       phoneValid: false,
-        type: 1
     };
   },
   watch: {
@@ -628,23 +627,23 @@ export default {
           console.log(error);
         });
     },
-    // openOrderModal(id) {
-    //   // this.emitClose();
-    //   let url = "/api/payment-status/" + id;
-    //   window.open(
-    //     "http://local.together.biz.ua:8080/p/sapogi-columbia-youth-minx-slip-iii",
-    //     "_self"
-    //   );
+    openOrderModal(id) {
+      // this.emitClose();
+      let url = "/api/payment-status/" + id;
+      window.open(
+        "http://local.together.biz.ua:8080/p/sapogi-columbia-youth-minx-slip-iii",
+        "_self"
+      );
 
-    //   this.$api
-    //     .post(url, { order_id: id })
-    //     .then((response) => {
-    //       console.log(response.data);
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     });
-    // },
+      this.$api
+        .post(url, { order_id: id })
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
     openSuccessModal() {
       this.emitClose();
       this.$bvModal
@@ -737,6 +736,11 @@ export default {
     },
     placeOrder() {
       this.isloading = true;
+        this.$gtag.event('Оформить заказ', {
+            'event_category': "покупка товара",
+            'event_label': "Нажата кнопка подтвердить заказ",
+            'value': 1,
+          });
 
       var order = {
         product_id: Number(this.product.id),
@@ -767,6 +771,7 @@ export default {
         delivery_house: this.selectedHouse ? this.selectedHouse : "",
         delivery_room: this.selectedRoom ? this.selectedRoom : "",
         delivery_comment: "",
+        type: 1
       };
       this.$apollo
         .mutate({
@@ -776,8 +781,8 @@ export default {
           },
         })
         .then((data) => {
-          console.log(data)
           var id = +data.data.userOrderCreate.id;
+        
           if (this.paymentType === 2) {
             // this.openOrderModal(id);
             this.payOnline(id);
@@ -786,6 +791,7 @@ export default {
           } else {
             this.thankYou(id);
             this.isloading = false;
+
             return;
           }
         })
@@ -857,18 +863,9 @@ export default {
       let url =
         location.protocol + "//" + location.host + "/success?id=" + orderId;
       window.open(url, "_self");
-      
     },
   },
   mounted() {
-    //Set initial qty
-    // this.getUserCards();
-    // setInterval(() => {
-    //   if (this.selectedPayment == null && !this.cards.length) {
-    //     this.getUserCards();
-    console.log(this.city);
-    //   }
-    // }, 1500);
 
     this.finalQty = this.qty;
   },
