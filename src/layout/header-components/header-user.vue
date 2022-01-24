@@ -76,7 +76,6 @@
         </div>
       </div>
     </template>
-    <cart/>
   </div>
 </template>
 
@@ -86,7 +85,6 @@ import roleSwitcher from "@/components/auth/roleSwitcher.vue";
 import notifications from "./header-notifications.vue";
 import favourites from "./header-favourites.vue";
 import orders from "./header-orders.vue";
-import cart from "./header-cart.vue";
 export default {
   data() {
     return {
@@ -98,7 +96,6 @@ export default {
     notifications,
     favourites,
     orders,
-    cart
   },
   computed: {
     ...mapGetters({
