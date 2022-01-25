@@ -1,6 +1,6 @@
 <template>
   <div v-if="categories" class="catalog-item-wrapper">
-    <div class="catalog-item" v-for="c in visibleCategories" :key="c.id">
+    <div class="catalog-item title" v-for="c in visibleCategories" :key="c.id">
       <router-link :to="{ name: 'category', params: { slug: c.slug } }">
         <icon variant="menu" class="cat-icon" />
         <span v-html="categoryTitleByLang(c)">{{ c.title }}</span>
@@ -118,12 +118,21 @@ export default {
       .catalog-item {
         display: flex;
         // position: relative;
-      
+    // &:nth-child(3n+1) {
+    //           background: red;
+    //         }
         &-wrapper {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           grid-template-rows: repeat(2, 35px);
           column-gap: 5px;
+          .title:nth-child(4), .title:nth-child(5), .title:nth-child(6){
+              &:hover {
+                .children-items {
+                  top: 66px;
+                }
+              }
+           }
         }
 
         a {
@@ -131,7 +140,8 @@ export default {
           text-decoration: none;
           // display: flex;
           padding: 4px;
-          display: block;  width: 100%;
+          display: block;
+          width: 100%;
           // align-items: center;
           // justify-content: flex-start;
           &.catalog-link-third-lvl {
@@ -144,7 +154,7 @@ export default {
             }
             &:hover {
               background: none;
-                  text-decoration: none;
+              text-decoration: none;
               span {
                 text-decoration: underline;
                 text-decoration: none;
@@ -165,14 +175,14 @@ export default {
           }
           & > svg:not(.cat-icon) {
             transform: rotate(0);
-     display: none;
+            display: none;
             width: 13px;
             height: 13px;
             fill: #fff;
             margin-left: 6px;
           }
           &:hover {
-           text-decoration: underline;
+            text-decoration: underline;
           }
         }
         .children-items {
@@ -211,7 +221,7 @@ export default {
             // margin-bottom: 20px;
             // margin-right: 20px;
             flex-direction: column;
-      
+        
           }
           &__title {
             background: transparent;
