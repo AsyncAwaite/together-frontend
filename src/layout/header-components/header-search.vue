@@ -1,5 +1,5 @@
 <template>
-  <div class="search__input-group  col-lg-4 col-12  order-4" v-click-outside="hide">
+  <div class="search__input-group  col-lg-4 col-12  order-4 order-lg-2" v-click-outside="hide">
     <input
       type="text"
       :placeholder="$t('labels.search')"

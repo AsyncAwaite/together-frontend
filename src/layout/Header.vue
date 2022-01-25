@@ -3,16 +3,15 @@
     <header class="header" :class="{ hideTop: hideTop }">
       <div class="container">
         <div class="row align-items-center">
-          <div class="col-4 order-1 col-lg-2 d-flex align-items-center">
+          <div class="col-3 order-1 col-lg-2 d-flex align-items-center">
             <router-link :to="{ name: 'home' }" class="header__logo">
               <img src="@/assets/img/logo_dark.svg" alt="" />
-            
             </router-link>
-             <span class="header__beta">beta</span>
+            <span class="header__beta">beta</span>
           </div>
-               <headerSearch />
+          <headerSearch />
           <div class="col-6 col-lg-3 order-2">
-            <div class="header__links ">
+            <div class="header__links">
               <ul>
                 <li>
                   <router-link
@@ -31,7 +30,7 @@
               </ul>
             </div>
           </div>
-          <div class="col-2 col-lg-3 order-3 ">
+          <div class="col-3 col-lg-3 order-3">
             <div>
               <header-user />
             </div>
@@ -41,8 +40,8 @@
       <div class="header__subheader">
         <div class="container">
           <div class="row align-items-center">
-            <div class="col-3 d-none d-lg-block">
-              <div
+            <div class="col-lg-10 d-none d-lg-block">
+              <!-- <div
                 class="header__catalog"
                 :class="{ active: showCatalog }"
                 v-on:mouseover="showCatalog = true"
@@ -55,30 +54,29 @@
                 >
                   <icon variant="menu" />
                   <span>
-                    {{ $t("labels.catalogue") }}
+                    {{ $t("labels.catalogue")  }}123
                   </span>
-                </div>
-                <div
-                  class="header__catalog-list"
-                  :class="{ active: showCatalog }"
-                >
-                  <catalog-list
-                    v-if="categories"
-                    :categories="sortedCategories"
-                  />
-                </div>
+                </div> -->
+              <div
+                class="header__catalog-list active"
+                :class="{ active: showCatalog }"
+              >
+                <catalog-list
+                  v-if="categories"
+                  :categories="sortedCategories"
+                />
               </div>
+              <!-- </div> -->
             </div>
-            <div class="col-9 col-lg-6 d-flex align-items-center">
+            <div class="col-9 d-lg-none d-flex align-items-center">
               <div
                 class="header__mobile-menu--toggle d-flex d-lg-none"
                 @click="showMobileDrawer = true"
               >
                 <icon variant="menu" />
               </div>
-         
             </div>
-            <div class="col-3">
+            <div class="col-3 col-lg-2">
               <div class="header__language text-right">
                 <header-language />
               </div>
@@ -181,9 +179,15 @@ export default {
   transition: 0.4s;
   &.hideTop {
     transition: 0.6s;
-    transform: translate(0, -52px);
+    transform: translate(0, -42px);
+    @media (min-width: 768px) {
+      transform: translate(0, -58px);
+    }
     @media (min-width: 1025px) {
-      transform: translate(0, -68px);
+      transform: translate(0, -54px);
+    }
+        @media (min-width: 1199px) {
+      transform: translate(0, -62px);
     }
   }
 
@@ -219,34 +223,33 @@ export default {
         height: 36px;
       }
     }
-  
   }
   &__beta {
     font-weight: 100;
     color: #000;
-  align-self: flex-start;
-font-size: 12px;
-margin-top: 5px;
-
+    align-self: flex-start;
+    font-size: 12px;
+    margin-top: 5px;
   }
 
   &__links {
-   
     ul {
       list-style: none;
       display: flex;
-justify-content: space-around;
+      justify-content: space-around;
       padding: 0;
-      margin: 0; width: 100%;
-      li {  display: flex;
-          align-items: center;
-            text-align: center;
+      margin: 0;
+      width: 100%;
+      li {
+        display: flex;
+        align-items: center;
+        text-align: center;
         a {
           font-style: normal;
           font-weight: 500;
           font-size: 14px;
-        width: 100%;
-      
+          width: 100%;
+
           color: #000000;
           text-transform: uppercase;
           // margin-right: 40px;
@@ -260,7 +263,8 @@ justify-content: space-around;
   &__subheader {
     margin-top: 8px;
     background: var(--secondary-color);
-    height: 44px;
+    // height: 44px;
+    padding: 8px 0;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -291,109 +295,6 @@ justify-content: space-around;
     }
     a {
       color: var(--primary-color);
-    }
-  }
-
-  &__catalog {
-    position: relative;
-    &-list {
-      position: absolute;
-      background: #fff;
-      top: 100%;
-      left: 0;
-      right: 0;
-      box-shadow: 0px 6px 16px 0px rgba(#000, 0.2);
-      padding: 20px 0px;
-      visibility: hidden;
-      opacity: 0;
-      transform: translateY(-20px);
-      transition: 0.3s;
-      z-index: 30;
-      &.active,
-      &.home {
-        visibility: visible;
-        opacity: 1;
-        transform: translateY(0px);
-        transition: 0.3s;
-      }
-      &.home {
-        box-shadow: 0px 6px 8px 0px rgba(#000, 0.1);
-      }
-      .catalog-item {
-        a {
-          color: #000;
-          text-decoration: none;
-          display: flex;
-          padding: 3px 8px;
-          align-items: center;
-          justify-content: flex-start;
-          & > span {
-            font-weight: 600;
-          }
-          & > .cat-icon {
-            width: 18px;
-            height: 18px;
-            margin-right: 16px;
-            margin-left: 6px;
-          }
-          & > svg:not(.cat-icon) {
-            transform: rotate(-90deg);
-            margin-left: auto;
-            width: 13px;
-            height: 13px;
-          }
-          &:hover {
-            background: #e7e7e7;
-          }
-        }
-        .children-items {
-          box-shadow: 0px 6px 6px 0px rgba(#000, 0.1);
-          padding: 20px 0px;
-          position: absolute;
-          min-width: 400px;
-          top: 0;
-          min-height: 100%;
-          background: #fff;
-          position: absolute;
-          box-sizing: border-box;
-          border: 1px solid rgba(#1ac1a1, 0.2);
-          left: 100%;
-          visibility: hidden;
-          opacity: 0;
-          transition: 0.3s;
-        }
-        &:hover {
-          & > a {
-            background: rgba(#1ac1a1, 0.2);
-          }
-          & > .children-items {
-            visibility: visible;
-            opacity: 1;
-            transition: 0.3s;
-          }
-        }
-      }
-    }
-    .toggle {
-      padding: 8px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      transition: 0.3s;
-
-      &:hover,
-      &.active,
-      &.home {
-        background: rgba(#fff, 0.1);
-        transition: 0.3s;
-      }
-      svg {
-        fill: #fff;
-        margin-right: 20px;
-        margin-left: 6px;
-      }
-      cursor: pointer;
-      color: #fff;
     }
   }
 }
